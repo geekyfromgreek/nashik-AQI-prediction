@@ -2,7 +2,7 @@
 
 This is a Streamlit dashboard built for my B.E. Artificial Intelligence & Data Science project. It analyzes historical air quality data (AQI) from Nashik, Maharashtra, and uses a trained Artificial Neural Network (ANN) to predict the AQI.
 
-🔗 **Live Application:** [View the Dashboard on Render](https://your-app-name.onrender.com)
+🔗 **Live Application:** [View the Dashboard on Render](https://nashik-aqi-prediction.onrender.com)
 
 ## Project Structure
 
