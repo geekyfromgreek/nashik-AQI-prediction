@@ -35,30 +35,6 @@ processed_df = load_processed_data()
 tab1, tab2, tab3 = st.tabs(["AQI & Pollutant Analysis", "Model Performance Visuals", "Feature Relationships"])
 
 with tab1:
-    st.markdown("## Daily AQI Trend")
-    fig_trend = go.Figure()
-    fig_trend.add_trace(
-        go.Scatter(
-            x=raw_df["date"],
-            y=raw_df["Index Value"],
-            mode="lines",
-            line=dict(color="#2E7D32", width=1.2),
-            name="Daily AQI",
-            hovertemplate="Date: %{x|%Y-%m-%d}<br>AQI: %{y}<extra></extra>",
-        )
-    )
-    rolling = raw_df.set_index("date")["Index Value"].rolling(30).mean()
-    fig_trend.add_trace(
-        go.Scatter(
-            x=rolling.index,
-            y=rolling.values,
-            mode="lines",
-            line=dict(color="#EF6C00", width=2, dash="dot"),
-            name="30-Day Rolling Avg",
-        )
-    )
-    fig_trend.update_layout(**plotly_layout("Daily AQI with 30-Day Rolling Average", height=400))
-    st.plotly_chart(fig_trend, use_container_width=True)
 
     c1, c2 = st.columns(2)
 
@@ -259,7 +235,7 @@ with tab3:
             texttemplate="%{text}",
             textfont=dict(size=9),
             hovertemplate="X: %{x}<br>Y: %{y}<br>Corr: %{z:.2f}<extra></extra>",
-            colorbar=dict(title="Correlation", titlefont=dict(size=11), tickfont=dict(size=10)),
+            colorbar=dict(title="Correlation", title_font=dict(size=11), tickfont=dict(size=10)),
         )
     )
     heat_layout = plotly_layout("Feature Correlation Matrix", height=560)
