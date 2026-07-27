@@ -118,9 +118,9 @@ with tab1:
                 hovertemplate="Year: %{x}<br>Avg AQI: %{y:.1f}<extra></extra>",
             )
         )
-        layout_yearly = plotly_layout("Yearly Average AQI Trend", height=380)
-        layout_yearly["xaxis"].update(tickmode="linear", dtick=1)
-        fig_yearly.update_layout(**layout_yearly)
+        yearly_layout = plotly_layout("Yearly Average AQI Trend", height=380)
+        yearly_layout["xaxis"].update(tickmode="linear", dtick=1)
+        fig_yearly.update_layout(**yearly_layout)
         st.plotly_chart(fig_yearly, use_container_width=True)
 
     with c4:
@@ -138,9 +138,9 @@ with tab1:
                 hovertemplate="%{y}: %{x}<extra></extra>",
             )
         )
-        layout_poll = plotly_layout("Frequency of Prominent Pollutants", height=380)
-        layout_poll["yaxis"].update(autorange="reversed", gridcolor="#F1F5F9")
-        fig_poll.update_layout(**layout_poll)
+        poll_layout = plotly_layout("Frequency of Prominent Pollutants", height=380)
+        poll_layout["yaxis"].update(autorange="reversed", gridcolor="#F1F5F9")
+        fig_poll.update_layout(**poll_layout)
         st.plotly_chart(fig_poll, use_container_width=True)
 
 with tab2:
@@ -262,8 +262,8 @@ with tab3:
             colorbar=dict(title="Correlation", titlefont=dict(size=11), tickfont=dict(size=10)),
         )
     )
-    layout_heat = plotly_layout("Feature Correlation Matrix", height=560)
-    layout_heat["xaxis"].update(tickangle=45, tickfont=dict(size=9), gridcolor="#F1F5F9")
-    layout_heat["yaxis"].update(tickfont=dict(size=9), autorange="reversed", gridcolor="#F1F5F9")
-    fig_heat.update_layout(**layout_heat)
+    heat_layout = plotly_layout("Feature Correlation Matrix", height=560)
+    heat_layout["xaxis"].update(tickangle=45, tickfont=dict(size=9), gridcolor="#F1F5F9")
+    heat_layout["yaxis"].update(tickfont=dict(size=9), autorange="reversed", gridcolor="#F1F5F9")
+    fig_heat.update_layout(**heat_layout)
     st.plotly_chart(fig_heat, use_container_width=True)

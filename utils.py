@@ -13,7 +13,7 @@ if os.path.isdir(_TF_PKG) and _TF_PKG not in sys.path:
     sys.path.insert(0, _TF_PKG)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, "app", "aqi_prediction_ann.weights.h5")
+MODEL_PATH = os.path.join(BASE_DIR, "app", "aqi_prediction_ann.keras")
 SCALER_PATH = os.path.join(BASE_DIR, "app", "scaler.pkl")
 RAW_DATA_PATH = os.path.join(BASE_DIR, "dataset", "Nashik_AQIBulletins.csv")
 PROCESSED_DATA_PATH = os.path.join(BASE_DIR, "dataset", "processed_aqi_data.csv")
@@ -56,12 +56,12 @@ POLLUTANT_CATEGORIES = [
 ]
 
 AQI_CATEGORIES = [
-    {"name": "Good",         "min": 0,   "max": 50,  "color": "#388E3C"},
-    {"name": "Satisfactory", "min": 51,  "max": 100, "color": "#689F38"},
-    {"name": "Moderate",     "min": 101, "max": 200, "color": "#F9A825"},
-    {"name": "Poor",         "min": 201, "max": 300, "color": "#EF6C00"},
-    {"name": "Very Poor",    "min": 301, "max": 400, "color": "#D32F2F"},
-    {"name": "Severe",       "min": 401, "max": 500, "color": "#7B1FA2"},
+    {"name": "Good", "min": 0, "max": 50, "color": "#388E3C"},
+    {"name": "Satisfactory", "min": 51, "max": 100, "color": "#689F38"},
+    {"name": "Moderate", "min": 101, "max": 200, "color": "#F9A825"},
+    {"name": "Poor", "min": 201, "max": 300, "color": "#EF6C00"},
+    {"name": "Very Poor", "min": 301, "max": 400, "color": "#D32F2F"},
+    {"name": "Severe", "min": 401, "max": 500, "color": "#7B1FA2"},
 ]
 
 MODEL_RESULTS = pd.DataFrame({
@@ -97,18 +97,33 @@ PLOTLY_COLORS = [
 
 @st.cache_resource(show_spinner=False)
 def load_model():
+    import zipfile
+    import tempfile
     from tensorflow.keras import Sequential
     from tensorflow.keras.layers import Input, Dense, Dropout
 
-    model = Sequential([
-        Input(shape=(19,)),
-        Dense(128, activation="relu"),
-        Dropout(0.2),
-        Dense(64, activation="relu"),
-        Dropout(0.2),
-        Dense(1, activation="linear"),
-    ])
-    model.load_weights(MODEL_PATH)
+    # aqi_prediction_ann.keras is a zip archive containing config.json,
+    # metadata.json, and model.weights.h5. Full-model deserialization
+    # (load_model on the .keras file directly) hits a Keras 3
+    # shared_object_id bug on this deploy environment, so instead we
+    # rebuild the architecture in code and pull just the weights out
+    # of the existing file -- no new model file needs to be added.
+    with zipfile.ZipFile(MODEL_PATH) as archive:
+        with archive.open("model.weights.h5") as weights_entry:
+            with tempfile.NamedTemporaryFile(suffix=".weights.h5") as tmp:
+                tmp.write(weights_entry.read())
+                tmp.flush()
+
+                model = Sequential([
+                    Input(shape=(len(FEATURE_COLUMNS),)),
+                    Dense(128, activation="relu"),
+                    Dropout(0.2),
+                    Dense(64, activation="relu"),
+                    Dropout(0.2),
+                    Dense(1, activation="linear"),
+                ])
+                model.load_weights(tmp.name)
+
     return model
 
 @st.cache_resource(show_spinner=False)
@@ -227,11 +242,11 @@ def render_kpi_card(
 ) -> str:
     return (
         f'<div class="kpi-card">'
-        f'  <div class="kpi-header">'
-        f'    <span class="kpi-title">{title}</span>'
-        f"  </div>"
-        f'  <div class="kpi-value" style="color:{color};">{value}</div>'
-        f'  <div class="kpi-subtitle">{subtitle}</div>'
+        f' <div class="kpi-header">'
+        f' <span class="kpi-title">{title}</span>'
+        f" </div>"
+        f' <div class="kpi-value" style="color:{color};">{value}</div>'
+        f' <div class="kpi-subtitle">{subtitle}</div>'
         f"</div>"
     )
 
