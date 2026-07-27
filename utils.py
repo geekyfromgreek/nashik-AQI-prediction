@@ -13,7 +13,7 @@ if os.path.isdir(_TF_PKG) and _TF_PKG not in sys.path:
     sys.path.insert(0, _TF_PKG)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, "app", "aqi_prediction_ann.keras")
+MODEL_PATH = os.path.join(BASE_DIR, "app", "aqi_prediction_ann.weights.h5")
 SCALER_PATH = os.path.join(BASE_DIR, "app", "scaler.pkl")
 RAW_DATA_PATH = os.path.join(BASE_DIR, "dataset", "Nashik_AQIBulletins.csv")
 PROCESSED_DATA_PATH = os.path.join(BASE_DIR, "dataset", "processed_aqi_data.csv")
@@ -97,8 +97,19 @@ PLOTLY_COLORS = [
 
 @st.cache_resource(show_spinner=False)
 def load_model():
-    from tensorflow.keras.models import load_model as keras_load
-    return keras_load(MODEL_PATH)
+    from tensorflow.keras import Sequential
+    from tensorflow.keras.layers import Input, Dense, Dropout
+
+    model = Sequential([
+        Input(shape=(19,)),
+        Dense(128, activation="relu"),
+        Dropout(0.2),
+        Dense(64, activation="relu"),
+        Dropout(0.2),
+        Dense(1, activation="linear"),
+    ])
+    model.load_weights(MODEL_PATH)
+    return model
 
 @st.cache_resource(show_spinner=False)
 def load_scaler():
